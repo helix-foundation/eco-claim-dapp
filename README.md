@@ -54,3 +54,6 @@ yarn start
 ```
 ## Contributing
 Contributions are welcome. Please submit any issues as issues on GitHub, and open a pull request with any contributions.
+
+## License
+[MIT (c) Helix Foundation](./LICENSE)
