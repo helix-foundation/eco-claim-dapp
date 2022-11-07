@@ -1,0 +1,42 @@
+.intro {
+    --transition-duration: 1s;
+    height: 100vh;
+    overflow: hidden;
+
+    &-stateVideo {
+
+    }
+
+    &-stateText {
+        .introWrapper {
+            transform: translateY(-50%);
+        }
+
+        .introVideo {
+            opacity: 0;
+            pointer-events: none;
+        }
+    }
+
+    &-stateComplete {
+        .introWrapper {
+            transform: translateY(-100%);
+        }
+
+        .introVideo,
+        .introText {
+            opacity: 0;
+            pointer-events: none;
+        }
+    }
+}
+
+.introWrapper {
+    height: 200vh;
+    transition: all var(--anim-curve-ease-out) var(--transition-duration);
+}
+
+.introVideo, .introText {
+    transition: all var(--anim-curve-ease-out) var(--transition-duration);
+    height: 100vh;
+}

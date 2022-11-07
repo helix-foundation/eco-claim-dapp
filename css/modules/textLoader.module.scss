@@ -1,0 +1,45 @@
+.textLoader {
+    color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+
+    &:before, &:after {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 20%;
+        background: linear-gradient(180deg, var(--color-background), transparent);
+        content: "";
+    }
+
+    &:after {
+        background: linear-gradient(0deg, var(--color-background), transparent);
+        top: auto;
+        bottom: 0;
+    }
+}
+
+.text {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.phrase {
+    white-space: nowrap;
+}
+
+.phrases {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    transition: all var(--anim-curve-ease-out) var(--anim-duration-long);
+}
+
+.placeholder {
+    opacity: 0;
+}

@@ -1,0 +1,97 @@
+$color-white: #fffffb;
+$color-black: #27292e;
+$color-accent: #924f35;
+
+:root {
+  --color-black: #{$color-black};
+  --color-teal: rgba(207, 229, 224, 1);
+  --color-yellow: #fcef63;
+  --color-blue: #2657a8;
+  --color-purple: #6363aa;
+  --color-gray: #6d7079;
+  --color-gray-light: #bcbdbf;
+  --color-brown: #924f35;
+  --color-white: #{$color-white};
+
+  --color-accent: #{$color-accent};
+  --color-accent-medium: #{transparentize($color-accent, .5)};
+  --color-accent-light: #{transparentize($color-accent, .9)};
+  --color-text: var(--color-black);
+  --color-text-medium: var(--color-gray);
+  --color-text-light: var(--color-gray-light);
+  --color-link: var(--color-black);
+  --color-nav-item-default: var(--color-gray);
+  --color-nav-item-selected: var(--color-accent);
+  --color-background: var(--color-white);
+  --color-background-shade: #{mix($color-white, $color-black, 97%)};
+
+  --border-radius-default: 24px;
+
+  --box-shadow-default: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --box-shadow-lifted: var(--box-shadow-default), 0 5px 15px rgba(0, 0, 0, 0.04);
+
+  --anim-curve-ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+  --anim-duration-normal: 120ms;
+  --anim-duration-long: 240ms;
+
+  --font-size-xsmall: 11px;
+  --font-size-small: 13px;
+  --font-size-default: 15px;
+  --font-size-large: 18px;
+  --font-size-xlarge: 24px;
+  --font-size-giant: 42px;
+
+  --column-gap-normal: 24px;
+  --column-gap-large: 48px;
+
+  --line-fill: var(--color-border);
+
+  --horizontal-gutter: 24px;
+
+  --space-xsmall: 4px;
+  --space-small: 8px;
+  --space-normal: 16px;
+  --space-large: 32px;
+  --space-xlarge: 64px;
+
+  --main-col-width: min(100%, 1000px);
+
+  --min-mobile-tap-size: 48px;
+
+  @media (max-width: 600px) {
+    --section-margin: 64px;
+
+    --column-gap-normal: 16px;
+    --column-gap-large: 32px;
+
+    --space-normal: 8px;
+    --space-large: 16px;
+    --space-xlarge: 32px;
+
+    --font-size-giant: 32px;
+  }
+}
+
+html {
+  font-family: "rubik";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smoothing: antialiased;
+  color: var(--color-text);
+  background-color: var(--color-white);
+  font-size: var(--font-size-default);
+
+  a {
+    color: var(--color-accent);
+  }
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+body {
+  overflow: hidden;
+}

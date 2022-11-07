@@ -1,0 +1,202 @@
+.projection {
+    margin-left: var(--space-normal);
+    margin-right: var(--space-normal);
+    position: relative;
+
+    &.highlighted { 
+        &:before, &:after {
+            position: absolute;
+            left: calc(var(--space-normal) * -1);
+            top: calc(var(--space-normal) * -1);
+            bottom: calc(var(--space-normal) * -1);
+            width: var(--space-normal);
+            content: "";
+            border: 1px solid var(--color-text);
+            border-right-width: 0;
+            opacity: 0.1;
+        }
+    
+        &:after {
+            left: auto;
+            right: calc(var(--space-normal) * -1);
+            border-left-width: 0;
+            border-right-width: 1px;
+        }
+    }
+}
+
+.projectionWrapper {
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: all ease 200ms;
+    margin-left: -100px;
+    margin-right: -100px;
+    padding-left: 100px;
+    padding-right: 100px;
+
+    &.projectionVisible {
+        pointer-events: all;
+        opacity: 1;
+    }
+}
+
+.projectionInnerWrapper {
+    padding-top: var(--space-large);
+}
+
+.projectionSlider {
+    margin-top: 0;
+}
+
+.chartWrapper {
+    margin: 0 var(--space-small);
+}
+
+.slider {
+    --slider-thumb-size: 30px;
+    --slider-track-height: 8px;
+
+    height: var(--slider-track-height);
+    position: relative;
+    border-radius: 999em;
+    margin: 0 auto;
+}
+
+.sliderThumb {
+    position: absolute;
+    left: calc(var(--slider-thumb-size) / -2);
+    top: calc(var(--slider-thumb-size) / -2 + (var(--slider-track-height) / 2));
+    height: var(--slider-thumb-size);
+    width: var(--slider-thumb-size);
+    background-color: var(--color-white);
+    border-radius: 50%;
+    user-select: none;
+    cursor: ew-resize;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .1), 0 1px 3px rgba(0, 0, 0, .15);
+
+    svg path {
+        fill: var(--color-accent);
+    }
+}
+
+.sliderFill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: var(--color-accent);
+    z-index: 1;
+    //border-radius: 999em;
+    opacity: 0;
+}
+
+.sliderMarkings {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    height: 100%;
+
+    div {
+        width: 1px;
+        height: 100%;
+        background-color: rgba(0, 0, 0, .2);
+
+        &:first-child {
+            opacity: 0;
+        }
+    }
+}
+
+.sliderLabels {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+
+    label {
+        width: 100%;
+        text-align: center;
+        font-size: var(--font-size-xsmall);
+        color: var(--color-text-medium);
+    }
+}
+
+.projectionChart {
+    position: relative;
+    margin-top: var(--space-large);
+
+    svg {
+        width: 100%;
+        display: block;
+
+        path {
+            fill: rgba(0, 0, 0, .1);
+        }
+    }
+}
+
+.projectionChartOverlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+
+    div {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: var(--color-background);
+        width: 200px;
+        opacity: 0.8;
+    }
+
+    span {
+        width: 2px;
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background-color: var(--color-accent);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+
+        label {
+            position: relative;
+            top: -10px;
+            background-color: var(--color-accent);
+            color: var(--color-background);
+            padding: 2px 6px;
+            font-size: 12px;
+            border-radius: 2px;
+            white-space: nowrap;
+            transition: transform ease 200ms;
+        }
+    }
+
+    svg {
+        path {
+            fill: var(--color-accent);
+            opacity: 0.3;
+        }
+        display: block;
+    }
+}
+
+.currencyItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xsmall);
+    svg {
+        width: 16px;
+        height: 16px;
+
+        path {
+            fill: var(--color-text-medium);
+        }
+    }
+}

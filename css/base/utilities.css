@@ -1,0 +1,39 @@
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.u-justify-center {
+  justify-content: center;
+}
+
+.u-justify-end {
+  justify-content: flex-end;
+}
+
+.u-justify-start {
+  justify-content: flex-start;
+}
+
+.u-align-center {
+  align-items: center;
+}
+
+.u-align-end {
+  align-items: flex-end;
+}
+
+.u-align-start {
+  align-items: flex-start;
+}
+
+.u-align-baseline {
+  align-items: baseline;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.select-none {
+  user-select: none;
+}

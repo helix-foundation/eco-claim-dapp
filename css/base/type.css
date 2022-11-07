@@ -1,0 +1,87 @@
+:root {
+  font-family: 'rubik';
+}
+
+h1, h2, h3, h4, h5, p, section, label, figure, figcaption {
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'romana';
+  color: var(--color-text);
+}
+
+h1 {
+  font-size: var(--font-size-giant);
+}
+
+h5 {
+  font-size: var(--font-size-large);
+}
+
+p {
+  font-size: var(--font-size-default);
+  line-height: 1.3;
+  color: var(--color-text-medium);
+}
+
+.sectionSubtitle {
+  color: var(--color-accent);
+  font-size: var(--font-size-small);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.sectionTitle {
+  font-size: var(--font-size-giant);
+}
+
+.text-size-small {
+  font-size: var(--font-size-small) !important;
+}
+
+.text-size-large {
+  font-size: var(--font-size-large) !important;
+}
+
+.text-size-xlarge {
+  font-size: var(--font-size-xlarge) !important;
+}
+
+.text-size-giant {
+  font-size: var(--font-size-giant) !important;
+}
+
+
+.text-color-normal {
+  color: var(--section-foreground-color) !important;
+}
+
+.text-color-medium {
+  color: var(--color-text-medium) !important;
+}
+
+.text-color-light {
+  color: var(--color-text-light) !important;
+}
+
+.text-color-accent {
+  color: var(--color-accent) !important;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+.font-weight-normal {
+  font-weight: normal !important;
+}
+
+.font-romana {
+  font-family: 'romana';
+}
+
+.font-default {
+  font-family: 'rubik';
+}

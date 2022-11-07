@@ -1,0 +1,134 @@
+@keyframes line-anim {
+    0% {
+        stroke-dashoffset: 0;
+    }
+
+    100% {
+        stroke-dashoffset: var(--line-length);
+    }
+}
+
+.layout {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    --line-length: 1267.5784912109375;
+}
+
+.layout-fullScreen {
+    --layout-fullscreen-max-width: 1000px;
+    display: grid;
+    width: 100vw;
+    height: 100vh;
+    grid-template-columns: [content] auto;
+    grid-template-rows: [content] auto;
+    overflow-x: hidden;
+}
+
+.section {
+    text-align: left;
+    position: relative;
+
+    &:first-child {
+        width: 40vw;
+    }
+
+    &:last-child {
+        width: 60vw;
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.sectionGraphic {
+    padding: 0;
+    background: var(--color-yellow);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    background: conic-gradient(from 207.83deg at 50% 112.06%, #6363AA -24.86deg, #FCEF63 55.98deg, #CFE5E0 166.14deg, #6363AA 335.14deg, #FCEF63 415.98deg);
+
+
+    .overlay {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+
+        svg {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            mix-blend-mode: color-burn;
+            
+            path {
+                stroke: var(--color-teal);
+                stroke-linecap: round;
+            }
+
+            &:last-child {
+                stroke-dasharray: calc(var(--line-length) / 4);
+                mix-blend-mode: overlay;
+                opacity: 0.5;
+                animation: line-anim linear 20s infinite forwards;
+            }
+        }
+    }
+
+    svg {
+        width: 90%;
+        height: 90%;
+    }
+
+    .coin {
+        --coin-size: 240px;
+        width: var(--coin-size);
+        height: var(--coin-size);
+        background-color: var(--color-teal);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        mix-blend-mode: overlay;
+        position: absolute;
+        top: calc((var(--coin-size) * (-1/3)));
+        opacity: 0.2;
+        box-shadow: 0 0 50px var(--color-blue);
+
+        &:nth-of-type(2) {
+            top: calc(50% - (var(--coin-size) / 2));
+        }
+
+        &:nth-of-type(3) {
+            top: calc(100% - (var(--coin-size) * (2/3)));
+        }
+    
+    }
+}
+
+.sectionContentScroll {
+    height: 0;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    > div {
+        margin-top: auto;
+        margin-bottom: auto;
+        padding-top: var(--space-xlarge);
+        padding-bottom: var(--space-xlarge);
+    }
+}

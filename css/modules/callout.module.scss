@@ -1,0 +1,13 @@
+.callout {
+    background-color: var(--color-background-shade);
+
+    padding: var(--space-normal);
+
+    > p {
+        font-size: var(--font-size-small);
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}

@@ -1,0 +1,155 @@
+.button {
+  --button-min-width: 100px;
+  background-color: var(--color-text);
+  color: var(--color-background);
+  font-family: "romana";
+  transition: all ease-out 120ms;
+  cursor: pointer;
+  opacity: 1;
+  font-size: 14px;
+  text-decoration: none;
+  position: relative;
+  display: inline-flex;
+  min-width: var(--button-min-width);
+  justify-content: center;
+  flex-shrink: 0;
+
+  &_wrapper {
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    z-index: 3;
+
+    &:before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      content: "";
+      background: var(--color-background);
+      z-index: 2;
+      transform: translateX(-100%);
+      transition: all var(--anim-curve-ease-out) 120ms;
+      opacity: 0.12;
+      mix-blend-mode: hard-light;
+    }
+  }
+
+  // shadow
+  &:before {
+    position: absolute;
+    top: 0;
+    left: 5px;
+    right: 5px;
+    bottom: 0;
+    content: "";
+    background: transparent;
+    z-index: 2;
+    transition: box-shadow var(--anim-curve-ease-out) 120ms;
+  }
+
+  &_content {
+    display: inline-flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 16px;
+    position: relative;
+  }
+
+  svg {
+    path,
+    g {
+      fill: var(--color-background);
+    }
+  }
+
+  &-small {
+    --button-min-width: 48px;
+    font-size: var(--font-size-small);
+    font-family: "rubik";
+    .button_content {
+      height: 26px;
+      padding: 0 8px;
+    }
+
+    svg {
+      width: 12px !important;
+      height: 12px !important;
+    }
+  }
+
+  &-large {
+    font-size: var(--font-size-large);
+
+    .button_content {
+      height: 48px;
+      padding: 0 24px;
+    }
+  }
+
+  &-secondary {
+    border: 1px solid var(--color-text-light);
+    color: var(--color-text);
+    background-color: transparent;
+    box-sizing: border-box;
+
+    svg path,
+    svg g {
+      fill: var(--color-text);
+    }
+
+    .button_wrapper {
+      &:before {
+        background-color: var(--color-text);
+      }
+    }
+  }
+
+  &-disabled,
+  &-loading {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  &-hasArrow {
+    svg {
+      width: 16px;
+      height: 16px;
+      margin-left: 4px;
+      display: block;
+      transition: transform ease-out 80ms;
+    }
+
+    &:hover {
+      svg {
+        transform: translateX(3px);
+      }
+    }
+  }
+
+  &:hover:not(.button-disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+
+    .button_wrapper {
+      &:before {
+        // maybe add this effect later
+        //transform: translateX(0);
+        border-radius: 0;
+      }
+    }
+
+    &.button-secondary {
+      &:before {
+        box-shadow: 0 3px 0 0 rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    &:before {
+      box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.1);
+    }
+  }
+}

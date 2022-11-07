@@ -1,0 +1,137 @@
+@keyframes blink {
+    0%, 30% {
+        opacity: 1;
+    }
+
+    45%, 50%, 55% {
+        opacity: 0;
+    }
+
+    70%, 100% {
+        opacity: 1;
+    }
+}
+
+.scroll {
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: auto;
+}
+
+.text {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    margin: var(--space-xlarge);
+}
+
+.textWrapper {
+    width: 50vw;
+    max-width: 600px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    font-size: var(--font-size-large);
+    color: var(--color-text-medium);
+    line-height: 1.8;
+    position: relative;
+    flex-direction: column;
+    margin-bottom: calc(var(--space-xlarge) * 4);
+}  
+
+.continueButton {
+    opacity: 0;
+    transition: opacity var(--anim-curve-ease-out) 1s;
+    transition-delay: .5s;
+}
+
+.continueButtonVisible {
+    opacity: 1;
+}
+
+.paraWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-content: flex-start;
+}
+
+.paraOuter {
+    position: relative;
+    margin-bottom: var(--space-normal);
+    transition: opacity ease var(--anim-duration-long);
+}
+
+.paraFocused {
+    opacity: 1;
+}
+
+.paraMuted {
+    opacity: 0.5;
+}
+
+.textItem {
+    overflow: hidden;
+
+    span {
+        display: inline-block;
+        transform: translateY(100%);
+        transition: all var(--anim-curve-ease-out) 1s;
+        opacity: 0;
+    }
+}
+
+.enter {
+    opacity: 0;
+    transition: opacity ease 1s;
+    display: flex;
+    align-items: center;
+
+    &:after {
+        content: "";
+        display: inline-block;
+        width: 10px;
+        height: 17px;
+        background-color: var(--color-text-light);
+        animation: blink linear 1.5s infinite forwards;
+        margin-left: 4px;
+        transform: translateY(-1px);
+    }
+
+    &.enterReady {
+        opacity: 0.5;
+        animation-delay: 1s;
+    }
+}
+
+.placeholder {
+    opacity: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    pointer-events: none;
+}
+
+.textEntering {
+    span {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+.textEnterDone {
+    span {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

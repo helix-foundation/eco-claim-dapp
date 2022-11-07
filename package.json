@@ -1,0 +1,46 @@
+{
+  "name": "eco-claim-dapp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "postbuild": "next export",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.7.0",
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@rainbow-me/rainbowkit": "0.5.2",
+    "axios": "^1.0.0",
+    "ethers": "^5.7.1",
+    "graphql": "^16.6.0",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.2.32",
+    "next": "12.3.1",
+    "rc-tooltip": "^5.2.2",
+    "react": "18.2.0",
+    "react-countdown": "^2.3.2",
+    "react-dom": "18.2.0",
+    "react-hook-form": "^7.36.1",
+    "react-toastify": "^9.0.8",
+    "tailwindcss": "^3.1.8",
+    "wagmi": "^0.6.8"
+  },
+  "devDependencies": {
+    "@types/node": "18.8.2",
+    "@types/react": "18.0.21",
+    "@types/react-dom": "18.0.6",
+    "classnames": "^2.3.2",
+    "eslint": "8.24.0",
+    "eslint-config-next": "12.3.1",
+    "lodash": "^4.17.21",
+    "prettier": "^2.7.1",
+    "react-cookie": "^4.1.1",
+    "react-transition-group": "^4.4.5",
+    "sass": "^1.55.0",
+    "typescript": "4.8.4"
+  }
+}

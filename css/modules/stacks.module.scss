@@ -1,0 +1,63 @@
+.vStack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &-full {
+    height: 100%;
+  }
+
+  &-centered {
+    justify-content: center;
+    align-items: center;
+  }
+
+  &-centerMain {
+    justify-content: center;
+  }
+}
+
+.hStack {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+
+  &-full {
+    width: 100%;
+  }
+
+  &-centered {
+    align-items: center;
+  }
+
+  &-spaceBetween {
+    justify-content: space-between;
+  }
+}
+
+.vStack,
+.hStack {
+  &-none {
+    gap: 0;
+  }
+
+  &-xsmall {
+    gap: 2px;
+  }
+
+  &-small {
+    gap: 4px;
+  }
+
+  &-medium {
+    gap: 8px;
+  }
+
+  &-large {
+    gap: 16px;
+  }
+
+  &-xlarge {
+    gap: 32px;
+  }
+}

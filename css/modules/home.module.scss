@@ -1,0 +1,46 @@
+
+
+.homeContent {
+    max-width: 500px;
+    width: 100%;
+}
+
+.homeWrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.claimButton {
+    padding: var(--space-normal);
+    background: var(--color-background-shade);
+    font-size: var(--font-size-large);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-normal);
+
+    .icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--color-accent-light);
+        
+        svg {
+            width: 60%;
+            height: 60%;
+            display: block;
+    
+            path {
+                fill: var(--color-accent);
+            }
+        }
+    }
+
+    &.isClaimed {
+        background-color: transparent;
+        border: 1px solid var(--color-background-shade);
+    }
+}

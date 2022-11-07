@@ -1,0 +1,19 @@
+.copy {
+    max-width: 500px;
+
+    > p {
+        margin-bottom: var(--space-normal);
+        font-size: var(--font-size-default);
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    &-large {
+        > p {
+            font-size: var(--font-size-large);
+            line-height: 1.5;
+        }
+    }
+}

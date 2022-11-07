@@ -1,0 +1,74 @@
+
+.claimDetails {
+    padding: var(--space-normal);
+    position: relative;
+
+    &:before, &:after {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: var(--space-normal);
+        content: "";
+        border: 1px solid var(--color-text);
+        border-right-width: 0;
+        opacity: 0.1;
+    }
+
+    &:after {
+        left: auto;
+        right: 0;
+        border-left-width: 0;
+        border-right-width: 1px;
+    }
+}
+
+.countdown {
+    padding: var(--space-normal);
+    background: var(--color-background-shade);
+    margin-top: var(--space-normal);
+}
+
+.countdownLabel {
+    color: var(--color-accent);
+    font-size: var(--text-size-small);
+}
+
+.loader {
+    height: 204px; // approximate
+    background-color: var(--color-background-shade);
+}
+
+.claimAccount {
+    padding-bottom: var(--space-normal);
+    margin-bottom: var(--space-normal);
+    border-bottom: 1px solid var(--color-background-shade);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-small);
+
+    svg {
+        width: 15px;
+        height: 15px;
+        display: block;
+        
+        path {
+            fill: var(--color-text-medium);
+        }
+    }
+}
+
+.currencyItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xsmall);
+    svg {
+        width: 16px;
+        height: 16px;
+
+        path {
+            fill: var(--color-text-medium);
+        }
+    }
+}

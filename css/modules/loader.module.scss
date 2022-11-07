@@ -1,0 +1,57 @@
+@keyframes blink {
+  0%,
+  19.999999% {
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  50%,
+  80% {
+    opacity: 1;
+  }
+
+  80.000001% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.loader {
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  --anim-dur: 0.75s;
+
+  span {
+    display: block;
+    background-color: var(--color-text-light);
+    animation: blink linear var(--anim-dur) infinite;
+    opacity: 0;
+    margin: 1px;
+
+    &:nth-child(1) {
+      animation-delay: 0;
+    }
+
+    &:nth-child(2) {
+      animation-delay: calc(var(--anim-dur) / 4);
+    }
+
+    &:nth-child(3) {
+      animation-delay: calc((var(--anim-dur) / 4) * 2);
+    }
+
+    &:nth-child(4) {
+      animation-delay: calc((var(--anim-dur) / 4) * 3);
+    }
+  }
+}

@@ -1,0 +1,45 @@
+.linkButton {
+    appearance: none;
+    padding: 0;
+    margin: 0;
+    text-decoration: none;
+    border: none;
+    background-color: transparent;
+    font-size: var(--font-size-default);
+    font-family: "rubik";
+    color: var(--color-accent);
+    transition: opacity var(--anim-curve-ease-out) var(--anim-duration-normal);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+
+    svg {
+        width: 14px;
+        height: 14px;
+        display: inline-flex;
+
+        path {
+            fill: var(--color-accent);
+        }
+    }
+
+    &-colorGray {
+        color: var(--color-text-medium);
+
+        svg {
+            path {
+                fill: var(--color-text-medium);
+            }
+        }
+    }
+
+    &-bounded {
+        background-color: var(--color-background-shade);
+        padding: 3px 6px;
+    }
+
+    &:hover {
+        opacity: 0.6;
+    }
+}
