@@ -8,8 +8,24 @@ const nextConfig = {
       // by next.js will be dropped. Doesn't make much sense, but how it is
       fs: false, // the solution
     };
-
     return config;
+  },
+  async headers() {
+    return [
+      {
+        source: '/',
+        headers: [
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'none'",
+          },
+        ],
+      },
+    ]
   },
 };
 

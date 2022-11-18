@@ -22,8 +22,9 @@ import HelpOverlay, { HelpOverlayContext } from "components/HelpOverlay";
 import UIBlock, { UIBlockContext } from "components/UIBlock";
 import Head from "next/head";
 import { EcoClaimProvider } from "providers/EcoClaim";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MobileBlock from "components/MobileBlock";
+import UnsecureGate from "components/UnsecureGate";
 
 const client = new ApolloClient({
   uri: process.env.NEXT_PUBLIC_SUBGRAPH_URI,
@@ -55,7 +56,12 @@ function ClaimDapp({ Component, pageProps }: AppProps) {
   const [shouldShowHelp, setShouldShowHelp] = useState(false);
   const [shouldShowBlock, setShouldShowBlock] = useState(false);
 
-  return (
+  const [unsecure, setUnsecure] = useState(true);
+  useEffect(() => {
+    setUnsecure(window.self !== window.top);
+  }, [])
+
+  return unsecure ? <UnsecureGate/> : (
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains}>
         <ApolloProvider client={client}>
