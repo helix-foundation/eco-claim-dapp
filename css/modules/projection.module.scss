@@ -138,6 +138,18 @@
     }
 }
 
+.projectionChartCurrentIndicator {
+    background-color: transparent !important;
+    top: -24px !important;
+    background: linear-gradient(0deg, rgba(0, 0, 0, .3) 0%, rgba(0, 0, 0, .3) 6px, transparent 4px);
+    background-size: 1.5px 12px;
+    background-repeat: repeat-y;
+
+    label {
+        background-color: var(--color-text-medium) !important;
+    }
+}
+
 .projectionChartOverlay {
     position: absolute;
     left: 0;

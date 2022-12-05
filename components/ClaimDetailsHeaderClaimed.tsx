@@ -12,18 +12,18 @@ import LinkButton from "./LinkButton";
 import VStack from "./vstack";
 
 type ClaimDetailsHeaderClaimedProps = {
-    verifiedClaims: VerifiedClaim[];
+    eligibleClaims: VerifiedClaim[];
     selectedClaim: VerifiedClaim;
     onBackButtonClick: () => void;
 }
 
 
-const ClaimDetailsHeaderClaimed = ({ verifiedClaims, selectedClaim, onBackButtonClick }: ClaimDetailsHeaderClaimedProps) => {
+const ClaimDetailsHeaderClaimed = ({ eligibleClaims, selectedClaim, onBackButtonClick }: ClaimDetailsHeaderClaimedProps) => {
 
     return (
         <>
             <VStack>
-                {verifiedClaims.length > 1 &&
+                {eligibleClaims.length > 1 &&
                     <div>
                         <LinkButton isBounded onClick={onBackButtonClick} text="Back" color="gray" small leadingIcon={
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -34,23 +34,45 @@ const ClaimDetailsHeaderClaimed = ({ verifiedClaims, selectedClaim, onBackButton
                         } />
                     </div>
                 }
-                <Copy>
-                    <p className="text-size-xlarge text-color-normal font-romana">
-                        <span className="text-color-medium"> {upperFirst(selectedClaim.app)}{" "}({shortAddress(selectedClaim.userid)}),</span>
-                        <br />
-                        <span className="text-color-normal">you&apos;ve completed your claim. But there&apos;s still more to come...</span>
-                    </p>
-                    <p>It pays to be early. But it also pays to be patient. You&apos;ll be eligible to claim more ECOx depending on how long you wait. Until then, it&apos;s time to build. To learn more about how to vote with your tokens, and how else you can use them, visit <a href="https://eco.org/" rel="noreferrer" target="_blank">eco.org</a> or drop into the <a href="http://discord.eco.org" rel="noreferrer" target="_blank">Eco Discord</a>.</p>
-                </Copy>
+                {selectedClaim.tokenRelease ? (
+                    <Copy>
+                        <p className="text-size-xlarge text-color-normal font-romana">
+                            <span className="text-color-medium"> {upperFirst(selectedClaim.app)}{" "}({shortAddress(selectedClaim.userid)}),</span>
+                            <br />
+                            <span className="text-color-normal">your claim is complete.</span>
+                        </p>
+                        <p>It&apos;s time to build. To learn more about how to vote with your tokens, and how else you can use them, visit <a href="https://eco.org/" rel="noreferrer" target="_blank">eco.org</a> or drop into the <a href="http://discord.eco.org" rel="noreferrer" target="_blank">Eco Discord</a>.</p>
+                    </Copy>
+                ) : (
+                    <Copy>
+                        <p className="text-size-xlarge text-color-normal font-romana">
+                            <span className="text-color-medium"> {upperFirst(selectedClaim.app)}{" "}({shortAddress(selectedClaim.userid)}),</span>
+                            <br />
+                            <span className="text-color-normal">you&apos;ve completed your first claim. But there&apos;s still more to come...</span>
+                        </p>
+                        <p>It pays to be early. But it also pays to be patient. You&apos;ll be eligible to claim more ECOx depending on how long you wait. Until then, it&apos;s time to build. To learn more about how to vote with your tokens, and how else you can use them, visit <a href="https://eco.org/" rel="noreferrer" target="_blank">eco.org</a> or drop into the <a href="http://discord.eco.org" rel="noreferrer" target="_blank">Eco Discord</a>.</p>
+                    </Copy>
+                )
+                }
             </VStack>
             <VStack gapSize={StackGapSize.None}>
-                <p className="sectionSubtitle text-color-medium">Claimed on {new Date(selectedClaim.tokenClaim.claimTime.toNumber() *
+                <p className="sectionSubtitle text-color-medium">First claim on {new Date(selectedClaim.tokenClaim.claimTime.toNumber() *
                     1000).toLocaleDateString('en-US')}</p>
                 <CurrencyItem amount={utils.formatUnits(selectedClaim.tokenClaim.amountEco)} currency="eco" />
                 <CurrencyItem amount={utils.formatUnits(selectedClaim.tokenClaim.amountEcox)} currency="ecox" />
             </VStack>
 
-            {verifiedClaims.length > 1 &&
+            {selectedClaim.tokenRelease ? (
+                <VStack gapSize={StackGapSize.None}>
+                    <p className="sectionSubtitle text-color-medium">Second claim on {new Date(selectedClaim.tokenRelease.claimTime.toNumber() *
+                        1000).toLocaleDateString('en-US')}</p>
+                    <CurrencyItem amount={utils.formatUnits(selectedClaim.tokenRelease.amountEco)} currency="eco" />
+                    <CurrencyItem amount={utils.formatUnits(selectedClaim.tokenRelease.amountEcox)} currency="ecox" />
+                </VStack>
+            ) : <></>
+            }
+
+            {eligibleClaims.length > 1 &&
                 <div>
                     <Button small title="Make another claim" secondary showArrow onClick={onBackButtonClick} />
                 </div>

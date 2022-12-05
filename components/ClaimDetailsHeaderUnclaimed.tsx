@@ -7,16 +7,16 @@ import VStack from "./vstack";
 
 
 type ClaimDetailsHeaderUnclaimedProps = {
-    verifiedClaims: VerifiedClaim[];
+    eligibleClaims: VerifiedClaim[];
     onBackButtonClick: () => void;
     selectedClaim: VerifiedClaim;
 }
 
-const ClaimDetailsHeaderUnclaimed = ({ verifiedClaims, onBackButtonClick, selectedClaim }: ClaimDetailsHeaderUnclaimedProps) => {
+const ClaimDetailsHeaderUnclaimed = ({ eligibleClaims, onBackButtonClick, selectedClaim }: ClaimDetailsHeaderUnclaimedProps) => {
     return (
         <VStack>
             {
-                verifiedClaims.length > 1 &&
+                eligibleClaims.length > 1 &&
                 <div>
                     <LinkButton isBounded onClick={onBackButtonClick} text="Back" color="gray" small leadingIcon={
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

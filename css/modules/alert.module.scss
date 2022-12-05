@@ -1,0 +1,89 @@
+.alert {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: rgba(0, 0, 0, .5);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--anim-curve-ease-out) var(--anim-duration-long);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &-isVisible {
+        opacity: 1;
+        pointer-events: all;
+        
+        .container {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+    }
+
+    .container {
+        background: var(--color-background);
+        overflow-y: auto;
+        border-radius: var(--border-radius-default);
+        display: flex;
+        flex-direction: column;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all var(--anim-curve-ease-out) var(--anim-duration-long);
+        transition-delay: 0.1s;
+        max-width: 50vw;
+        margin-left: auto;
+        margin-right: auto;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+        padding: var(--space-large);
+        min-width: 300px;
+    }
+
+    .title {
+        font-weight: 600;
+    }
+
+    .alertClose {
+        position: absolute;
+        top: calc((var(--min-mobile-tap-size) - var(--space-large)) / 2);
+        right: calc((var(--min-mobile-tap-size) - var(--space-large)) / 2);
+        width: var(--min-mobile-tap-size);
+        height: var(--min-mobile-tap-size);
+        appearance: none;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        padding: 0;
+        margin: 0;
+    
+        &:hover {
+            opacity: 0.7;
+        }
+    
+        &:before {
+            position: absolute;
+            width: var(--space-large);
+            height: var(--space-large);
+            background-color: red;
+            content: "";
+            border-radius: 50%;
+            background-color: var(--color-background-shade);
+            z-index: 1;
+        }
+    
+        svg {
+            position: relative;
+            z-index: 2;
+    
+            path {
+                stroke: var(--color-text-light);
+            }
+        }
+    }
+}

@@ -4,13 +4,11 @@ import classNames from "classnames";
 import styles from "css/modules/claim-details.module.scss";
 import { BigNumber, utils } from "ethers";
 import { VerifiedClaim } from "hooks/VerifiedClaims";
-import { upperFirst } from "lodash";
 import { useEcoClaim } from "providers/EcoClaim";
 import Countdown from "react-countdown";
 import Button from "./button";
 import CurrencyItem from "./CurrencyItem";
 import HStack, { StackGapSize } from "./hstack";
-import TextLoader from "./TextLoader";
 import VStack from "./vstack";
 
 type ClaimDetailsProps = {
@@ -42,7 +40,7 @@ const ClaimDetails = ({ claimingEndsAt, claim, hasAdditionalClaims, onClaimButto
         <div className={styles.claimDetails}>
             <HStack align="end">
                 <VStack style={{ flex: 1 }} gapSize={StackGapSize.Small}>
-                    <p className="sectionSubtitle">Available to claim today</p>
+                    <p className="sectionSubtitle">First Claim</p>
                     <CurrencyItem amount={getEco()} currency="eco" message="The points are the point" />
                     <CurrencyItem amount={getEcoX()} currency="ecox" message="We all win together" />
                 </VStack>

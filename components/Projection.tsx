@@ -1,9 +1,10 @@
 import classNames from "classnames";
 import styles from "css/modules/projection.module.scss";
-import { utils } from "ethers";
+import { BigNumber, utils } from "ethers";
 import { VerifiedClaim } from "hooks/VerifiedClaims";
 import { useEcoClaim } from "providers/EcoClaim";
 import { useContext, useEffect, useRef, useState } from "react";
+import Button from "./button";
 import CurrencyItem from "./CurrencyItem";
 import { HelpOverlayContext } from "./HelpOverlay";
 import HStack, { StackGapSize } from "./hstack";
@@ -13,11 +14,20 @@ import VStack from "./vstack";
 type ProjectionProps = {
     value?: number;
     claim: VerifiedClaim;
+    onClaimButtonClick: () => void;
+    isClaimPending: boolean;
 }
 
-const Projection = ({ value = 100, claim }: ProjectionProps) => {
+const points = 5;
+
+const Projection = ({ claim, onClaimButtonClick, isClaimPending }: ProjectionProps) => {
 
     const [x, setX] = useState(0);
+
+    const [currentCliffX, setCurrentCliffX] = useState(0);
+    const [cliffs, setCliffs] = useState([]);
+    const [currentCliff, setCurrentCliff] = useState<{ availableAfter: number, amount: BigNumber } | null>(null);
+
     const [sliderRect, setSliderRect] = useState<DOMRect>(null);
     const [wrapperHeight, setWrapperHeight] = useState(0);
     const sliderRef = useRef<HTMLDivElement>(null);
@@ -30,9 +40,48 @@ const Projection = ({ value = 100, claim }: ProjectionProps) => {
     const futureClaims = ecoClaim.getVestingCliffs(claim.points, Date.now());
 
     useEffect(() => {
-        setSliderRect(sliderRef.current.getBoundingClientRect());
-        setWrapperHeight(measureRef.current.getBoundingClientRect().height);
-    }, [showDetails])
+        if (sliderRef.current) {
+            setSliderRect(sliderRef.current.getBoundingClientRect());
+            setWrapperHeight(measureRef.current.getBoundingClientRect().height);
+        }
+    }, [showDetails, sliderRef])
+
+    useEffect(() => {
+        const getCurrentCliff = () => {
+            const currTime = Math.round(Date.now() / 1000);
+
+            const cliffWidth = sliderRect.width / (points - 1);
+
+            const vestingCliffs = ecoClaim.getVestingCliffs(claim.points, claim.tokenClaim.claimTime.toNumber());
+            // reduce to only the upticks in amount
+            const cliffs = [vestingCliffs[0], vestingCliffs[5], vestingCliffs[17], vestingCliffs[23]];
+
+            // find the earliest cliff that hasn't been reached yet
+            const index = cliffs.findIndex((cliff) => cliff.availableAfter > currTime)
+
+            if (index === -1) {
+                // no such index? all cliffs have passed
+                const yearInSeconds = 31536000;
+                setCurrentCliffX(sliderRect.width - cliffWidth + (cliffWidth * ((currTime - cliffs[cliffs.length - 1].availableAfter) / yearInSeconds)));
+                setCurrentCliff(cliffs[cliffs.length - 1]);
+            } else {
+                const currentCliffTimeRange = cliffs[index].availableAfter - (index > 0 ? cliffs[index - 1].availableAfter : claim.tokenClaim.claimTime.toNumber());
+                const timeSinceCurrentCliffStarted = currTime - (index > 0 ? cliffs[index - 1].availableAfter : claim.tokenClaim.claimTime.toNumber());
+
+                setCurrentCliffX(index === 0 ? 0 : ((index - 1) * cliffWidth) + ((timeSinceCurrentCliffStarted / currentCliffTimeRange) * cliffWidth))
+                setCurrentCliff(index > 0 ? cliffs[index - 1] : null);
+            }
+
+            setCliffs(cliffs);
+        }
+
+        if (claim.tokenClaim && sliderRect) {
+            getCurrentCliff();
+            const timer = setInterval(() => getCurrentCliff(), 5000);
+            return () => clearInterval(timer);
+        }
+
+    }, [claim, sliderRect, ecoClaim]);
 
     useEffect(() => {
         if (claim.tokenClaim) {
@@ -46,32 +95,23 @@ const Projection = ({ value = 100, claim }: ProjectionProps) => {
         xRef.current = x;
     }
 
-    const getValue = () => {
+    const getValuesFromSliderPosition = (): [string, string] => {
         const x = getSliderRatio();
-        const points = 5;
         const sectionSize = 1 / (points - 1);
 
-        for (let i = 1; i < points + 1; i++) {
-            if (i === points) {
-                return utils.formatUnits(futureClaims[i - 2].amount);
-            }
+        const cliffs = [futureClaims[0], futureClaims[5], futureClaims[17], futureClaims[23]];
 
-            if (x < sectionSize * i) {
-                return utils.formatUnits(futureClaims[i - 1].amount);
-            }
+        const i = Math.floor(x / sectionSize);
+
+        if (i >= points - 1) {
+            return [getEco(), utils.formatUnits(cliffs[cliffs.length-1].amount)];
+        }
+        else {
+            return [getEco(), utils.formatUnits(cliffs[i].amount)];
         }
     }
 
-    const getMaxValue = () => {
-        return utils.formatUnits(futureClaims[futureClaims.length - 1].amount);
-    }
-
-    const getMinValue = () => {
-        return utils.formatUnits(futureClaims[0].amount);
-    }
-
     const snapToNearestPoint = () => {
-        const points = 5;
         const sectionSize = 1 / (points - 1);
 
         for (let i = 0; i < points; i++) {
@@ -124,7 +164,6 @@ const Projection = ({ value = 100, claim }: ProjectionProps) => {
 
     const getCurrentSection = () => {
         const x = getSliderRatio();
-        const points = 5;
         const sectionSize = 1 / (points - 1);
 
         for (let i = 0; i < points + 1; i++) {
@@ -137,33 +176,73 @@ const Projection = ({ value = 100, claim }: ProjectionProps) => {
     const getLabelText = () => {
         switch (getCurrentSection()) {
             case 0: {
-                return "After 30 days"
+                if (cliffs.length > 0) {
+                    return new Date(cliffs[0].availableAfter * 1000).toLocaleDateString('en-US');
+                } else {
+                    return "After 30 days"
+                }
             }
             case 1: {
-                return "After 6 months"
+                if (cliffs.length > 0) {
+                    return new Date(cliffs[1].availableAfter * 1000).toLocaleDateString('en-US');
+                } else {
+                    return "After 6 months"
+                }
             }
             case 2: {
-                return "After 18 months"
+                if (cliffs.length > 0) {
+                    return new Date(cliffs[2].availableAfter * 1000).toLocaleDateString('en-US');
+                } else {
+                    return "After 18 months"
+                }
             }
             case 3: {
-                return "After 2 years"
+                if (cliffs.length > 0) {
+                    return new Date(cliffs[3].availableAfter * 1000).toLocaleDateString('en-US');
+                } else {
+                    return "After 2 years"
+                }
             }
             case 4: {
-                return "After 2+ years"
+                if (cliffs.length > 0) {
+                    return new Date(cliffs[3].availableAfter * 1000).toLocaleDateString('en-US');
+                } else {
+                    return "After 2+ years"
+                }
             }
         }
     }
 
-    const getDisplayValue = () => {
-        if (showDetails) {
-            return String(getValue());
-        } else {
-            return String(getMinValue()) + " \u2013 " + String(getMaxValue());
-        }
+    const getMaxValue = () => {
+        return utils.formatUnits(futureClaims[futureClaims.length - 1].amount);
     }
 
-    const getEcoDisplayValue = () => {
-        return String(getEco());
+    const getMinValue = () => {
+        return utils.formatUnits(futureClaims[0].amount);
+    }
+
+    const getDisplayValues = () => {
+        let [eco, ecox] = getValuesFromSliderPosition();
+        if (currentCliff) {
+            // a cliff has passed, get realtime values
+            eco = getEco();
+            ecox = String(utils.formatUnits(currentCliff.amount));
+        }
+        else if (claim.tokenClaim) {
+            // the claim has gone through, but no cliff has passed, show 0
+            eco = "0";
+            ecox = "0";
+
+        }
+        else if (!showDetails) {
+            // no claim, no details, show reg values
+            eco = getEco();
+            ecox = String(getMinValue()) + " \u2013 " + String(getMaxValue());
+        }
+        return {
+            eco,
+            ecox,
+        }
     }
 
     const getEco = () => {
@@ -176,22 +255,34 @@ const Projection = ({ value = 100, claim }: ProjectionProps) => {
         setShouldShow(true);
     }
 
+    if (claim.tokenRelease) {
+        return <></>;
+    }
+
     return (
         <div className={classNames(
             styles.projection,
             claim.tokenClaim ? styles.highlighted : undefined
         )}>
             <HStack align="end">
-                <VStack gapSize={StackGapSize.None}>
-                    <p className={`sectionSubtitle ${!claim.tokenClaim ? "text-color-medium" : ""}`}>Available to claim later</p>
-                    <CurrencyItem amount={getEcoDisplayValue()} currency="eco" />
-                    <CurrencyItem amount={getDisplayValue()} currency="ecox" />
+                <VStack style={{ flex: 1 }} gapSize={StackGapSize.Small}>
+                    <p className={`sectionSubtitle ${!claim.tokenClaim ? "text-color-medium" : ""}`}>Second Claim</p>
+                    <CurrencyItem amount={getDisplayValues().eco} currency="eco" />
+                    <CurrencyItem amount={getDisplayValues().ecox} currency="ecox" />
                 </VStack>
-                {!claim.tokenClaim &&
-                    <div style={{ flex: 1, textAlign: "right" }}>
-                        <LinkButton text={`${showDetails ? "Hide" : "Show"} details`} small color="gray" onClick={() => { setShowDetails(current => !current) }} />
-                    </div>
-                }
+                <VStack>
+                    {!claim.tokenClaim &&
+                        <div style={{ flex: 1, textAlign: "right" }}>
+                            <LinkButton text={`${showDetails ? "Hide" : "Show"} details`} small color="gray" onClick={() => { setShowDetails(current => !current) }} />
+                        </div>
+                    }
+                    {currentCliff && (
+                        <HStack justify="end">
+                            <Button title="Claim Now" showArrow onClick={onClaimButtonClick} disabled={isClaimPending} isLoading={isClaimPending} />
+                        </HStack>
+                    )}
+                </VStack>
+
             </HStack>
 
             <div className={classNames(styles.projectionWrapper, showDetails ? styles.projectionVisible : undefined)} style={{
@@ -201,9 +292,10 @@ const Projection = ({ value = 100, claim }: ProjectionProps) => {
                     <VStack gapSize={StackGapSize.Large}>
                         <p className="text-size-small text-color-medium">
                             {!claim.tokenClaim ?
-                                <> 30 days after you complete this first claim, you’ll be able to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></>
-                                :
-                                <>In 30 days, you’ll be able to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></>
+                                <> 30 days after you complete your first claim, you’ll be able to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></>
+                                : currentCliffX ?
+                                    <>You're ready to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></> :
+                                    <>In 30 days, you’ll be able to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></>
                             }
                         </p>
                         <div className={styles.chartWrapper}>
@@ -212,17 +304,29 @@ const Projection = ({ value = 100, claim }: ProjectionProps) => {
                                     <path fillRule="evenodd" clipRule="evenodd" d="M243 0H182.25V20H121.5V40H60.75V60H0V80H60.75H121.5H182.25H243V0Z" fill="#D9D9D9" />
                                 </svg>
                                 <div className={styles.projectionChartOverlay}>
-                                    <svg preserveAspectRatio="none" width="243" height="80" viewBox="0 0 243 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path fillRule="evenodd" clipRule="evenodd" d="M243 0H182.25V20H121.5V40H60.75V60H0V80H60.75H121.5H182.25H243V0Z" fill="#D9D9D9" />
-                                    </svg>
-                                    <div style={{ width: `calc(100% - ${x}px)` }} />
-                                    <span style={{ right: `calc(100% - ${x + 1}px)` }}>
-                                        <label style={{
-                                            transform: `translateX(${x < 30 ? "24px" : x > sliderRect.width - 30 ? "-30px" : 0})`
-                                        }}>{getLabelText()}</label>
-                                    </span>
+                                    <>
+                                        <svg preserveAspectRatio="none" width="243" height="80" viewBox="0 0 243 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path fillRule="evenodd" clipRule="evenodd" d="M243 0H182.25V20H121.5V40H60.75V60H0V80H60.75H121.5H182.25H243V0Z" fill="#D9D9D9" />
+                                        </svg>
+                                        <div style={{ width: `calc(100% - ${x}px)` }} />
+                                        <span style={{ right: `calc(100% - ${x + 1}px)`, zIndex: 1 }}>
+                                            <label style={{
+                                                transform: `translateX(${x < 30 ? "24px" : x > sliderRect.width - 30 ? "-30px" : 0})`
+                                            }}>{getLabelText()}</label>
+                                        </span>
+                                    </>
+                                    {currentCliffX && currentCliff ? (
+                                        <>
+                                            <span className={styles.projectionChartCurrentIndicator} style={{ right: `calc(100% - ${currentCliffX}px)`, zIndex: 0 }}>
+                                                <label style={{
+                                                    transform: `translateX(${currentCliffX < 30 ? "24px" : currentCliffX > sliderRect.width - 30 ? "-30px" : 0})`,
+                                                }}>Current ECOx payout ({getDisplayValues().ecox})</label>
+                                            </span>
+                                        </>
+                                    ) : null}
                                 </div>
                             </div>
+
                             <div className={styles.projectionSlider}>
                                 <div className={styles.slider} ref={sliderRef} onMouseDown={handleMouseDown}>
                                     <div className={styles.sliderThumb} onMouseDown={handleThumbMouseDown} style={{
@@ -244,6 +348,7 @@ const Projection = ({ value = 100, claim }: ProjectionProps) => {
                                     </div>
                                 </div>
                             </div>
+
                             <div className={styles.sliderLabels}>
                                 <label>{utils.formatUnits(futureClaims[0].amount)} ECOx</label>
                                 <label>{utils.formatUnits(futureClaims[5].amount)} ECOx</label>
