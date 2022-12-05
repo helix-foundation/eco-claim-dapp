@@ -27,7 +27,7 @@ const Alert = ({ shouldShow, alertBody }: AlertProps) => {
                         </button>
                         <VStack gapSize={StackGapSize.Medium}>
                             <p className={styles.title}>Are you sure?</p>
-                            <p>You haven't yet reached the maximum possible earned ECOx based on your payout schedule.</p>
+                            <p>You haven&apos;t yet reached the maximum possible earned ECOx based on your payout schedule.</p>
                             <div />
                             <HStack>
                                 <Button title="Cancel" onClick={alertBody.primaryButtonHandler} />

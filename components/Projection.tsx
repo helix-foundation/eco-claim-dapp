@@ -294,7 +294,7 @@ const Projection = ({ claim, onClaimButtonClick, isClaimPending }: ProjectionPro
                             {!claim.tokenClaim ?
                                 <> 30 days after you complete your first claim, you’ll be able to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></>
                                 : currentCliffX ?
-                                    <>You're ready to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></> :
+                                    <>You&apos;re ready to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></> :
                                     <>In 30 days, you’ll be able to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></>
                             }
                         </p>
