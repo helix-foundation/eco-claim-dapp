@@ -251,10 +251,6 @@ const Projection = ({ claim, onClaimButtonClick, isClaimPending }: ProjectionPro
 
     const { setShouldShow } = useContext(HelpOverlayContext);
 
-    const handleLearnMoreClick = () => {
-        setShouldShow(true);
-    }
-
     if (claim.tokenRelease) {
         return <></>;
     }
@@ -292,11 +288,12 @@ const Projection = ({ claim, onClaimButtonClick, isClaimPending }: ProjectionPro
                     <VStack gapSize={StackGapSize.Large}>
                         <p className="text-size-small text-color-medium">
                             {!claim.tokenClaim ?
-                                <> 30 days after you complete your first claim, you’ll be able to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></>
+                                `30 days after you complete your first claim, you’ll be able to claim another ${getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. `
                                 : currentCliffX ?
-                                    <>You&apos;re ready to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></> :
-                                    <>In 30 days, you’ll be able to claim another {getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. <a onClick={handleLearnMoreClick} style={{ cursor: "pointer" }}>Want to learn more?</a></>
+                                    `You’re ready to claim another ${getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. ` :
+                                    `In 30 days, you’ll be able to claim another ${getEco()} ECO. And you’ll also be able to claim more ECOx, although the longer you wait, the more you’ll get. `
                             }
+                            <a href="https://eco.org/articles/eco-ecox-overview#community-claim" rel="noreferrer" target="_blank" style={{ cursor: "pointer" }}>Want to learn more?</a>
                         </p>
                         <div className={styles.chartWrapper}>
                             <div className={styles.projectionChart}>
