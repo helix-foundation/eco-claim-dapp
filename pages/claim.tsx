@@ -270,6 +270,11 @@ const Home: NextPage = () => {
                                         claim={selectedClaim} onClaimButtonClick={handleClaimButtonClick}
                                         isClaimPending={isLoading}
                                     />
+                                    {(unclaimed.length + readyForSecondClaim.length) > 0 &&
+                                        <div>
+                                            <Button small title="You have another claim" secondary showArrow onClick={() => { setSelectedClaim(null) }} />
+                                        </div>
+                                    }
                                 </>
                                 :
                                 <>
@@ -329,12 +334,8 @@ const Home: NextPage = () => {
                                         </VStack>
 
                                     }
-
-
                                 </>
-
                             }
-
                         </VStack>
                     }
                 </div>

@@ -71,12 +71,6 @@ const ClaimDetailsHeaderClaimed = ({ eligibleClaims, selectedClaim, onBackButton
                 </VStack>
             ) : <></>
             }
-
-            {eligibleClaims.length > 1 &&
-                <div>
-                    <Button small title="Make another claim" secondary showArrow onClick={onBackButtonClick} />
-                </div>
-            }
         </>
     )
 }
