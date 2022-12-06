@@ -65,7 +65,7 @@ const ClaimDetails = ({ claimingEndsAt, claim, hasAdditionalClaims, onClaimButto
                                         `text-size-small`,
                                         styles.countdownLabel
                                     )}>Claim Window ends in: {days}d, {hours}h, {minutes}m, {seconds}s</p>
-                                    <p className="text-size-small">You’ll be eligible to claim more ECO and ECOx starting 30 days after you complete this claim process. <a href="https://eco.org/articles/eco-ecox-overview#community-claim" rel="noreferrer" target="_blank" className="text-color-medium">Want to know more?</a>.
+                                    <p className="text-size-small">You’ll be eligible to claim more ECO and ECOx starting 30 days after you complete this claim process. <a href="https://eco.org/articles/eco-ecox-overview#community-claim" rel="noreferrer" target="_blank" className="text-color-medium">Want to know more?</a>
                                     </p>
                                 </>
                             )

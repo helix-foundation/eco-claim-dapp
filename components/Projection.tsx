@@ -32,7 +32,7 @@ const Projection = ({ claim, onClaimButtonClick, isClaimPending }: ProjectionPro
     const [wrapperHeight, setWrapperHeight] = useState(0);
     const sliderRef = useRef<HTMLDivElement>(null);
     const xRef = useRef(x);
-    const [showDetails, setShowDetails] = useState(false);
+    const [showDetails, setShowDetails] = useState(true);
     const measureRef = useRef<HTMLDivElement>(null);
 
     const ecoClaim = useEcoClaim();
