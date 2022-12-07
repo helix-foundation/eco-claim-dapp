@@ -188,21 +188,21 @@ const Home: NextPage = () => {
         if (!selectedClaim) { return }
 
         const refreshedSelectedClaim = getClaimForUserId(selectedClaim.userid);
+        setSelectedClaim(refreshedSelectedClaim);
         // first claim
         if (refreshedSelectedClaim && refreshedSelectedClaim.tokenClaim && isAwaitingClaimConfirmation) {
-            setSelectedClaim(refreshedSelectedClaim);
+            
             setIsLoading(false);
             setIsAwaitingClaimConfirmation(false);
             toast({ title: "Claim successful!", intent: 'success' });
         }
         // second claim
         if (refreshedSelectedClaim && refreshedSelectedClaim.tokenRelease && isAwaitingReleaseConfirmation) {
-            setSelectedClaim(refreshedSelectedClaim);
             setIsLoading(false);
             setIsAwaitingReleaseConfirmation(false);
             toast({ title: "Claim successful!", intent: 'success' });
         }
-    }, [eligible, selectedClaim])
+    }, [eligible, notReadyForSecondClaim, readyForSecondClaim])
 
     useEffect(() => {
         uiBlockContext.setShouldShow(isLoading);
@@ -270,7 +270,7 @@ const Home: NextPage = () => {
                                         claim={selectedClaim} onClaimButtonClick={handleClaimButtonClick}
                                         isClaimPending={isLoading}
                                     />
-                                    {(unclaimed.length + readyForSecondClaim.length) > 0 &&
+                                    {([...unclaimed, ...readyForSecondClaim].filter(claim => !(claim.app === selectedClaim.app && claim.userid === selectedClaim.userid)).length) > 0 &&
                                         <div>
                                             <Button small title="You have another claim" secondary showArrow onClick={() => { setSelectedClaim(null) }} />
                                         </div>

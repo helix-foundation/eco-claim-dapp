@@ -1,5 +1,5 @@
 import { utils } from "ethers";
-import { VerifiedClaim } from "hooks/VerifiedClaims";
+import { ClaimState, VerifiedClaim } from "hooks/VerifiedClaims";
 import { shortAddress } from "pages/claim";
 import Button from "./button";
 import Callout from "./callout";
@@ -48,9 +48,10 @@ const ClaimDetailsHeaderClaimed = ({ eligibleClaims, selectedClaim, onBackButton
                         <p className="text-size-xlarge text-color-normal font-romana">
                             <span className="text-color-medium"> {upperFirst(selectedClaim.app)}{" "}({shortAddress(selectedClaim.userid)}),</span>
                             <br />
-                            <span className="text-color-normal">you&apos;ve completed your first claim. But there&apos;s still more to come...</span>
+                            <span className="text-color-normal">{selectedClaim.claimState === ClaimState.ReadyForSecondClaim ? "Congratulations, you're eligible to claim!" : "you've completed your first claim. But there's still more to come..."}</span>
                         </p>
-                        <p>It pays to be early. But it also pays to be patient. You&apos;ll be eligible to claim more ECOx depending on how long you wait. Until then, it&apos;s time to build. To learn more about how to vote with your tokens, and how else you can use them, visit <a href="https://eco.org/" rel="noreferrer" target="_blank">eco.org</a> or drop into the <a href="http://discord.eco.org" rel="noreferrer" target="_blank">Eco Discord</a>.</p>
+                        <p>It pays to be early. But it also pays to be patient. {selectedClaim.claimState === ClaimState.ReadyForSecondClaim ? "You're eligible to make your final claim now, but will be able " : "You'll be eligible "}to claim more ECOx depending on how long you wait.</p>
+                        <p>You can transfer claimed ECO and ECOx to your connected wallet. Note that there will be a gas cost for the claim.</p>
                     </Copy>
                 )
                 }
