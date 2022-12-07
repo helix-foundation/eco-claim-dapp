@@ -210,10 +210,11 @@ const Home: NextPage = () => {
 
 
     const getClaimCount = () => {
-        if (unclaimed.length === 1) {
+        const length = unclaimed.length + readyForSecondClaim.length;
+        if (length === 1) {
             return "1 claim";
         } else {
-            return `${unclaimed.length} claims`;
+            return `${length} claims`;
         }
     }
 
