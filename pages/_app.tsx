@@ -25,6 +25,7 @@ import { EcoClaimProvider } from "providers/EcoClaim";
 import { useState, useEffect } from "react";
 import MobileBlock from "components/MobileBlock";
 import UnsecureGate from "components/UnsecureGate";
+import Alert, { AlertContext } from "components/Alert";
 
 const client = new ApolloClient({
   uri: process.env.NEXT_PUBLIC_SUBGRAPH_URI,
@@ -55,13 +56,18 @@ function ClaimDapp({ Component, pageProps }: AppProps) {
 
   const [shouldShowHelp, setShouldShowHelp] = useState(false);
   const [shouldShowBlock, setShouldShowBlock] = useState(false);
+  const [shouldShowAlert, setShouldShowAlert] = useState(false);
+  const [alertBody, setAlertBody] = useState({
+    primaryButtonHandler: () => { },
+    secondaryButtonHandler: () => { }
+  })
 
   const [unsecure, setUnsecure] = useState(true);
   useEffect(() => {
     setUnsecure(window.self !== window.top);
   }, [])
 
-  return unsecure ? <UnsecureGate/> : (
+  return unsecure ? <UnsecureGate /> : (
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains}>
         <ApolloProvider client={client}>
@@ -70,37 +76,45 @@ function ClaimDapp({ Component, pageProps }: AppProps) {
               shouldShow: shouldShowHelp,
               setShouldShow: setShouldShowHelp
             }}>
-              <UIBlockContext.Provider value={{
-                shouldShow: shouldShowBlock,
-                setShouldShow: setShouldShowBlock
+              <AlertContext.Provider value={{
+                shouldShow: shouldShowAlert,
+                setShouldShow: setShouldShowAlert,
+                alertBody: alertBody,
+                setAlert: setAlertBody
               }}>
-                <Head>
-                  <title>Eco Claim</title>
-                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                <UIBlockContext.Provider value={{
+                  shouldShow: shouldShowBlock,
+                  setShouldShow: setShouldShowBlock
+                }}>
+                  <Head>
+                    <title>Eco Claim</title>
+                    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
 
-                  <link rel="alternate icon" type="image/png" href="/favicon.png" />
-                  <meta name="description"
-                    content="Claim your on-chain Eco ID representing your Discord or Twitter account." />
+                    <link rel="alternate icon" type="image/png" href="/favicon.png" />
+                    <meta name="description"
+                      content="Claim your on-chain Eco ID representing your Discord or Twitter account." />
 
-                  <meta property="og:title" content="Eco Claim" />
-                  <meta property="og:type" content="website" />
-                  <meta property="og:url" content="https://claim.eco.id" />
-                  <meta property="og:image" content="/meta_image.png" />
+                    <meta property="og:title" content="Eco Claim" />
+                    <meta property="og:type" content="website" />
+                    <meta property="og:url" content="https://claim.eco.id" />
+                    <meta property="og:image" content="/meta_image.png" />
 
-                  <link rel="image_src" href="/meta_image.png" />
+                    <link rel="image_src" href="/meta_image.png" />
 
-                  <meta name="twitter:title" content="Eco Claim" />
-                  <meta name="twitter:description" content="Claim your on-chain Eco ID representing your Discord or Twitter account." />
-                  <meta name="twitter:image" content="/meta_image.png" />
-                  <meta name="twitter:card" content="summary_large_image" />
+                    <meta name="twitter:title" content="Eco Claim" />
+                    <meta name="twitter:description" content="Claim your on-chain Eco ID representing your Discord or Twitter account." />
+                    <meta name="twitter:image" content="/meta_image.png" />
+                    <meta name="twitter:card" content="summary_large_image" />
 
-                </Head>
-                <Component {...pageProps} />
-                <ToastContainer position="bottom-right" />
-                <HelpOverlay shouldShow={shouldShowHelp} />
-                <MobileBlock />
-                <UIBlock />
-              </UIBlockContext.Provider>
+                  </Head>
+                  <Component {...pageProps} />
+                  <ToastContainer position="bottom-right" />
+                  <HelpOverlay shouldShow={shouldShowHelp} />
+                  <Alert shouldShow={shouldShowAlert} alertBody={alertBody} />
+                  <MobileBlock />
+                  <UIBlock />
+                </UIBlockContext.Provider>
+              </AlertContext.Provider>
             </HelpOverlayContext.Provider>
           </EcoClaimProvider>
         </ApolloProvider>

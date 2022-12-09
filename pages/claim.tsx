@@ -16,7 +16,7 @@ import Layout from "components/layout";
 import LoggedOut from "components/loggedOut";
 import Projection from "components/Projection";
 import VStack from "components/vstack";
-import { useVerifiedClaims, VerifiedClaim } from "hooks/VerifiedClaims";
+import { ClaimState, useVerifiedClaims, VerifiedClaim } from "hooks/VerifiedClaims";
 import { useEcoClaim } from "providers/EcoClaim";
 import EcoClaim from "../assets/abi/EcoClaim.json";
 import useMerkleTree from "../hooks/MerkleTree";
@@ -28,6 +28,8 @@ import ClaimDetailsHeaderUnclaimed from "components/ClaimDetailsHeaderUnclaimed"
 import { UIBlockContext } from "components/UIBlock";
 import styles from "css/modules/home.module.scss";
 import { txError, toast } from "utilities";
+import { AlertContext } from "components/Alert";
+import Pill from "components/Pill";
 
 export const shortAddress = (address: string) => {
     if (!address) { return "" }
@@ -41,18 +43,43 @@ const Home: NextPage = () => {
     const [isConnected, setIsConnected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isAwaitingClaimConfirmation, setIsAwaitingClaimConfirmation] = useState(false);
+    const [isAwaitingReleaseConfirmation, setIsAwaitingReleaseConfirmation] = useState(false);
     const [selectedClaim, setSelectedClaim] = useState<VerifiedClaim>(null);
+    const [isFullyVested, setIsFullyVested] = useState(false);
 
     const ecoClaim = useEcoClaim();
-    const verifiedClaims = useVerifiedClaims(address, ecoClaim.trustedVerifier);
-
-    const unclaimed = verifiedClaims.filter(verifiedClaim => !verifiedClaim.tokenClaim);
-    const claimed = verifiedClaims.filter(verifiedClaim => verifiedClaim.tokenClaim)
+    const [eligible, unclaimed, notReadyForSecondClaim, readyForSecondClaim, fullyClaimed] = useVerifiedClaims(address);
 
     // ask to connect wallet, or if wallet is connected, get data on registrations and mints
     const { leaves } = useMerkleTree();
 
     const uiBlockContext = useContext(UIBlockContext);
+    const alertContext = useContext(AlertContext);
+
+    useEffect(() => {
+        const getCurrentCliff = () => {
+            const currTime = Math.round(Date.now() / 1000);
+
+            const vestingCliffs = ecoClaim.getVestingCliffs(selectedClaim.points, selectedClaim.tokenClaim.claimTime.toNumber());
+            // reduce to only the upticks in amount
+            const cliffs = [vestingCliffs[0], vestingCliffs[5], vestingCliffs[17], vestingCliffs[23]];
+
+            // find the earliest cliff that hasn't been reached yet
+            const index = cliffs.findIndex((cliff) => cliff.availableAfter > currTime)
+
+            if (index === -1) {
+                // no such index? all cliffs have passed
+                setIsFullyVested(true);
+            } else {
+                setIsFullyVested(index >= cliffs.length);
+            }
+        }
+
+        if (selectedClaim && selectedClaim.tokenClaim) {
+            getCurrentCliff();
+        }
+
+    }, [selectedClaim, ecoClaim]);
 
     const claim = async ({ app, userid, points }: VerifiedClaim) => {
         setIsLoading(true);
@@ -106,8 +133,38 @@ const Home: NextPage = () => {
         }
     };
 
+    // aka second claim
+    const release = async ({ app, userid }) => {
+        setIsLoading(true);
+        try {
+
+            const claimContract = new ethers.Contract(
+                ecoClaim.address,
+                EcoClaim.abi,
+                signer!
+            );
+
+            const claimTx = await claimContract.releaseTokens(`${app}:${userid}`,
+                { gasLimit: 500_000 }
+            );
+
+            const claimReceipt = await claimTx.wait();
+
+            if (!claimReceipt.status) {
+                setIsLoading(false);
+                throw new Error(claimTx);
+            } else {
+                setIsAwaitingReleaseConfirmation(true);
+            }
+        } catch (err) {
+            setIsLoading(false);
+            txError("Claim failed", err)
+            console.log(err);
+        }
+    }
+
     const getClaimForUserId = (userId: string): VerifiedClaim => {
-        for (let claim of verifiedClaims) {
+        for (let claim of eligible) {
             if (claim.userid === userId) {
                 return claim;
             }
@@ -122,7 +179,7 @@ const Home: NextPage = () => {
     }, [address])
 
     useEffect(() => {
-        if (verifiedClaims.length === 1 && !selectedClaim) {
+        if (eligible.length === 1 && !selectedClaim) {
             setSelectedClaim(unclaimed[0])
         }
     }, [unclaimed])
@@ -131,14 +188,21 @@ const Home: NextPage = () => {
         if (!selectedClaim) { return }
 
         const refreshedSelectedClaim = getClaimForUserId(selectedClaim.userid);
-
+        setSelectedClaim(refreshedSelectedClaim);
+        // first claim
         if (refreshedSelectedClaim && refreshedSelectedClaim.tokenClaim && isAwaitingClaimConfirmation) {
-            setSelectedClaim(refreshedSelectedClaim);
+            
             setIsLoading(false);
             setIsAwaitingClaimConfirmation(false);
-            toast({title: "Claim successful!", intent: 'success'});
+            toast({ title: "Claim successful!", intent: 'success' });
         }
-    }, [verifiedClaims, selectedClaim])
+        // second claim
+        if (refreshedSelectedClaim && refreshedSelectedClaim.tokenRelease && isAwaitingReleaseConfirmation) {
+            setIsLoading(false);
+            setIsAwaitingReleaseConfirmation(false);
+            toast({ title: "Claim successful!", intent: 'success' });
+        }
+    }, [eligible, notReadyForSecondClaim, readyForSecondClaim])
 
     useEffect(() => {
         uiBlockContext.setShouldShow(isLoading);
@@ -146,15 +210,34 @@ const Home: NextPage = () => {
 
 
     const getClaimCount = () => {
-        if (unclaimed.length === 1) {
+        const length = unclaimed.length + readyForSecondClaim.length;
+        if (length === 1) {
             return "1 claim";
         } else {
-            return `${unclaimed.length} claims`;
+            return `${length} claims`;
         }
     }
 
     const handleClaimButtonClick = () => {
-        claim(selectedClaim);
+        if (!selectedClaim.tokenClaim) {
+            claim(selectedClaim);
+        }
+        else {
+            if (!isFullyVested) {
+                alertContext.setAlert({
+                    primaryButtonHandler: () => {
+                        alertContext.setShouldShow(false);
+                    },
+                    secondaryButtonHandler: () => {
+                        alertContext.setShouldShow(false);
+                        release(selectedClaim);
+                    }
+                })
+                alertContext.setShouldShow(true);
+            } else {
+                release(selectedClaim);
+            }
+        }
     }
 
     return (
@@ -169,14 +252,14 @@ const Home: NextPage = () => {
                             {selectedClaim ?
                                 <>
                                     {selectedClaim.tokenClaim ?
-                                        <ClaimDetailsHeaderClaimed onBackButtonClick={() => { setSelectedClaim(null) }} verifiedClaims={verifiedClaims} selectedClaim={selectedClaim} />
+                                        <ClaimDetailsHeaderClaimed onBackButtonClick={() => { setSelectedClaim(null) }} eligibleClaims={eligible} selectedClaim={selectedClaim} />
                                         :
                                         <>
-                                            <ClaimDetailsHeaderUnclaimed onBackButtonClick={() => { setSelectedClaim(null) }} verifiedClaims={verifiedClaims} selectedClaim={selectedClaim} />
+                                            <ClaimDetailsHeaderUnclaimed onBackButtonClick={() => { setSelectedClaim(null) }} eligibleClaims={eligible} selectedClaim={selectedClaim} />
                                             <ClaimDetails
                                                 claimingEndsAt={ecoClaim.claimingEndsAt}
                                                 claim={selectedClaim}
-                                                hasAdditionalClaims={verifiedClaims.length > 1}
+                                                hasAdditionalClaims={eligible.length > 1}
                                                 onClaimButtonClick={handleClaimButtonClick}
                                                 isClaimPending={isLoading}
                                                 handleChangeButtonClick={() => { setSelectedClaim(null) }}
@@ -184,11 +267,19 @@ const Home: NextPage = () => {
                                         </>
                                     }
                                     <div />
-                                    <Projection claim={selectedClaim} />
+                                    <Projection
+                                        claim={selectedClaim} onClaimButtonClick={handleClaimButtonClick}
+                                        isClaimPending={isLoading}
+                                    />
+                                    {([...unclaimed, ...readyForSecondClaim].filter(claim => !(claim.app === selectedClaim.app && claim.userid === selectedClaim.userid)).length) > 0 &&
+                                        <div>
+                                            <Button small title="You have another claim" secondary showArrow onClick={() => { setSelectedClaim(null) }} />
+                                        </div>
+                                    }
                                 </>
                                 :
                                 <>
-                                    {verifiedClaims.length === 0 ?
+                                    {eligible.length === 0 ?
                                         <Copy>
                                             <p className="text-size-xlarge text-color-normal font-romana">
                                                 <span className="text-color-medium">Welcome <strong>{shortAddress(address)}</strong>,</span>
@@ -207,29 +298,45 @@ const Home: NextPage = () => {
                                         </Copy>
                                     }
 
+                                    {readyForSecondClaim.length > 0 &&
+                                        <VStack>
+                                            <p className="sectionSubtitle">Ready to redeem second claim</p>
+                                            {readyForSecondClaim.map(claim => {
+                                                return <ClaimButton key={claim.userid} claim={claim} onButtonClick={(_) => { setSelectedClaim(claim) }} actionAvailable={false} />
+                                            })}
+                                        </VStack>
+
+                                    }
                                     {unclaimed.length > 0 &&
                                         <VStack>
-                                            <p className="sectionSubtitle">Ready to redeem</p>
+                                            <p className="sectionSubtitle">Ready to redeem first claim</p>
                                             {unclaimed.map(claim => {
-                                                return <ClaimButton key={claim.userid} claim={claim} onButtonClick={(_) => { setSelectedClaim(claim) }} isClaimed={false} />
+                                                return <ClaimButton key={claim.userid} claim={claim} onButtonClick={(_) => { setSelectedClaim(claim) }} actionAvailable={false} />
                                             })}
                                         </VStack>
 
                                     }
 
-                                    {claimed.length > 0 &&
+                                    {notReadyForSecondClaim.length > 0 &&
                                         <VStack>
-                                            <p className="sectionSubtitle">Previously redeemed</p>
-                                            {claimed.map(claim => {
-                                                return <ClaimButton key={claim.userid} claim={claim} onButtonClick={() => { }} isClaimed />
+                                            <p className="sectionSubtitle">Awaiting second redeem</p>
+                                            {notReadyForSecondClaim.map(claim => {
+                                                return <ClaimButton key={claim.userid} claim={claim} onButtonClick={(_) => { }} actionAvailable />
+                                            })}
+                                        </VStack>
+
+                                    }
+                                    {fullyClaimed.length > 0 &&
+                                        <VStack>
+                                            <p className="sectionSubtitle">Fully redeemed</p>
+                                            {fullyClaimed.map(claim => {
+                                                return <ClaimButton key={claim.userid} claim={claim} onButtonClick={() => { }} actionAvailable />
                                             })}
                                         </VStack>
 
                                     }
                                 </>
-
                             }
-
                         </VStack>
                     }
                 </div>
@@ -242,16 +349,18 @@ const Home: NextPage = () => {
 type ClaimButtonProps = {
     claim: VerifiedClaim;
     onButtonClick: (id: string) => void;
-    isClaimed: boolean;
+    actionAvailable: boolean;
 }
 
-const ClaimButton = ({ claim, isClaimed, onButtonClick }: ClaimButtonProps) => {
+const ClaimButton = ({ claim, actionAvailable, onButtonClick }: ClaimButtonProps) => {
+
+    const ecoClaim = useEcoClaim();
 
     const getDate = (claimTime: BigNumber) => {
         return new Date(claimTime.toNumber() * 1000).toLocaleDateString('en-US');
     }
 
-    return <div className={classNames(styles.claimButton, isClaimed ? styles.isClaimed : undefined)} key={claim.userid}>
+    return <div className={classNames(styles.claimButton, actionAvailable ? styles.actionAvailable : undefined)} key={claim.userid}>
         <HStack gapSize={StackGapSize.Large}>
             <div className={styles.icon}>
                 {claim.app === "twitter" &&
@@ -270,19 +379,29 @@ const ClaimButton = ({ claim, isClaimed, onButtonClick }: ClaimButtonProps) => {
             </div>
             <VStack gapSize={StackGapSize.Small}>
                 <strong>{upperFirst(claim.app)}</strong>
-                <VStack gapSize={StackGapSize.None}>
+                <VStack gapSize={StackGapSize.Small}>
                     <span className="text-size-small text-color-medium">ID: {claim.userid}</span>
-                    {isClaimed && <p className="text-size-small">Redeemed on: {getDate(claim.tokenClaim.claimTime)}</p>}
+                    {claim.claimState > ClaimState.Unclaimed && (
+                        <HStack gapSize={StackGapSize.Small}>
+                            <Pill><>1st claim • {getDate(claim.tokenClaim.claimTime)}</></Pill>
+                            <span className="text-size-small text-color-medium">{utils.formatUnits(claim.tokenClaim.amountEco)} ECO • {utils.formatUnits(claim.tokenClaim.amountEcox)} ECOx</span>
+                        </HStack>
+                    )}
+                    {claim.claimState === ClaimState.FullyClaimed ? (
+                        <HStack gapSize={StackGapSize.Small}>
+                            <Pill><>2nd claim • {getDate(claim.tokenRelease.claimTime)}</></Pill>
+                            <span className="text-size-small text-color-medium">{utils.formatUnits(claim.tokenRelease.amountEco)} ECO • {utils.formatUnits(claim.tokenRelease.amountEcox)} ECOx</span>
+                        </HStack>
+                    ) : claim.claimState > ClaimState.Unclaimed ? (
+                        <HStack gapSize={StackGapSize.Small}>
+                            <Pill><>2nd claim</></Pill>
+                            <span className="text-size-small text-color-medium">Eligible {getDate(BigNumber.from(ecoClaim.getVestingCliffs(claim.points, claim.tokenClaim.claimTime.toNumber())[0].availableAfter))}</span>
+                        </HStack>
+                    ) : null}
                 </VStack>
             </VStack>
         </HStack>
-        {!isClaimed && <Button showArrow title="Select" onClick={onButtonClick.bind(this, claim.userid)} />}
-        {isClaimed &&
-            <VStack gapSize={StackGapSize.None}>
-                <p className="text-size-small"><strong className="text-color-normal">{utils.formatUnits(claim.tokenClaim.amountEco)}</strong> ECO</p>
-                <p className="text-size-small"><strong className="text-color-normal">{utils.formatUnits(claim.tokenClaim.amountEcox)}</strong> ECOx</p>
-            </VStack>
-        }
+        {!actionAvailable && <Button showArrow title="Select" onClick={onButtonClick.bind(this, claim.userid)} />}
     </div>
 };
 

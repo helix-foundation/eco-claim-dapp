@@ -5,8 +5,27 @@
   display: flex;
   justify-content: flex-end;
   z-index: 999;
-
   padding: var(--space-large);
+  border-bottom-left-radius: var(--border-radius-default);
+
+  backdrop-filter: blur(8px);
+
+  &:after {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    background-color: var(--color-background);
+    content: "";
+    z-index: 0;
+    border-bottom-left-radius: var(--border-radius-default);
+    opacity: 0.8;
+  }
+
+  > * {
+    z-index: 1;
+  }
 
   ul {
     list-style: none;
