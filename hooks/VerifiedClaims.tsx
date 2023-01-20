@@ -90,10 +90,10 @@ export const useVerifiedClaims = (address: string | null): VerifiedClaim[][] => 
             eligible = data.verifiedClaims.reduce((eligibleClaims: VerifiedClaim[], subgraphVerifiedClaim) => {
                 // no points, not claimable
                 // not verified by the trusted verifier, not claimable
-                const pts = BigNumber.from(points[subgraphVerifiedClaim.id] || 0);
+                const pts = BigNumber.from(points[subgraphVerifiedClaim.claim.id] || 0);
     
                 if (pts.gt(0) && subgraphVerifiedClaim.verifiers.find((verifier) => verifier.address === ecoClaim.trustedVerifier)) {
-                    const [app, userid] = subgraphVerifiedClaim.id.split(':');
+                    const [app, userid] = subgraphVerifiedClaim.claim.id.split(':');
     
                     let verifiedClaim: VerifiedClaim = {
                         ...subgraphVerifiedClaim,
@@ -156,7 +156,9 @@ export const useVerifiedClaims = (address: string | null): VerifiedClaim[][] => 
 const VERIFIED_CLAIMS = gql`
     query VerifiedClaims($address: String) {
         verifiedClaims(where: {recipient: $address}) {
-            id
+            claim {
+                id
+            }
             recipient
             verifiers {
                 address
