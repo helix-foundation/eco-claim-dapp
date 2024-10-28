@@ -246,7 +246,7 @@ const Projection = ({ claim, onClaimButtonClick, isClaimPending }: ProjectionPro
     }
 
     const getEco = () => {
-        return utils.formatUnits(claim.points.mul(ecoClaim.POINTS_MULTIPLIER).mul(ecoClaim.currentInflationMultiplier).div(ecoClaim.initialInflationMultiplier));
+        return utils.formatUnits(claim.points.mul(ecoClaim.POINTS_MULTIPLIER).mul(ecoClaim.initialInflationMultiplier).div(ecoClaim.currentInflationMultiplier));
     }
 
     const { setShouldShow } = useContext(HelpOverlayContext);

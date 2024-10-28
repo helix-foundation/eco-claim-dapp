@@ -25,7 +25,7 @@ const ClaimDetails = ({ claimingEndsAt, claim, hasAdditionalClaims, onClaimButto
     const ecoClaim = useEcoClaim();
 
     const getEco = () => {
-        return utils.formatUnits(claim.points.mul(ecoClaim.POINTS_MULTIPLIER).mul(ecoClaim.currentInflationMultiplier).div(ecoClaim.initialInflationMultiplier));
+        return utils.formatUnits(claim.points.mul(ecoClaim.POINTS_MULTIPLIER).mul(ecoClaim.initialInflationMultiplier).div(ecoClaim.currentInflationMultiplier));
     }
 
     const getEcoX = () => {
